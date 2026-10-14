@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediAssist | AI-Based Healthcare System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f4f8fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 900px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .role-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .role-card {
+            width: 250px;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .role-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .role-card h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .role-card p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .role-card a {
+            display: block;
+            text-decoration: none;
+            background: #1976d2;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .role-card a:hover {
+            background: #125ea8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">🩺 MediAssist</div>
+
+    <div class="subtitle">
+        AI-Based Healthcare System
+    </div>
+
+    <div class="role-container">
+
+        <!-- Patient -->
+        <div class="role-card">
+            <div class="icon">👤</div>
+            <h2>Patient</h2>
+            <p>Manage your health records and receive AI-based health guidance.</p>
+
+            <a href="{% url 'patient_login' %}">Login</a>
+            <a href="{% url 'patient_register' %}">Register</a>
+        </div>
+
+        <!-- Doctor -->
+        <div class="role-card">
+            <div class="icon">👨‍⚕️</div>
+            <h2>Doctor</h2>
+            <p>View patients, health information, and consultation requests.</p>
+
+            <a href="{% url 'doctor_login' %}">Login</a>
+            <a href="{% url 'doctor_register' %}">Register</a>
+        </div>
+
+        <!-- Admin -->
+        <div class="role-card">
+            <div class="icon">👨‍💼</div>
+            <h2>Admin</h2>
+            <p>Manage patients, doctors, and the healthcare system.</p>
+
+            <a href="/admin/">Admin Login</a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

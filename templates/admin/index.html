@@ -1,0 +1,10 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+{% block content %}
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px;">
+  <a class="button" href="{% url 'admin:accounts_appointment_add' %}">Add Appointment</a>
+  <a class="button" href="{% url 'admin:accounts_doctor_add' %}">Add Doctor</a>
+  <a class="button" href="{% url 'admin:accounts_medicalrecord_add' %}">Add Medical Record</a>
+</div>
+{{ block.super }}
+{% endblock %}

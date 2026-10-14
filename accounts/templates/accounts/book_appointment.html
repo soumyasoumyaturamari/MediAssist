@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | MediAssist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f4f8fb; color: #333; }
+        .header { background: #176b62; color: white; padding: 18px 40px; }
+        .header h1 { font-size: 25px; }
+        .container { width: 650px; max-width: 92%; margin: 40px auto; }
+        .card { background: white; padding: 35px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #176b62; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #777; margin-bottom: 30px; }
+        .message { padding: 14px; border-radius: 8px; margin-bottom: 20px; }
+        .error-message { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: bold; margin-bottom: 7px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 7px; font-size: 15px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #176b62; }
+        textarea { min-height: 100px; resize: vertical; }
+        .help-text { font-size: 13px; color: #777; margin-top: 6px; }
+        button { width: 100%; padding: 12px; background: #176b62; color: white; border: none; border-radius: 7px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #12554e; }
+        button:disabled { background: #aaa; cursor: not-allowed; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: #176b62; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="header"><h1>🩺 MediAssist</h1></div>
+
+<div class="container">
+    <div class="card">
+        <h2>📅 Book Appointment</h2>
+        <p class="subtitle">Schedule an appointment with a doctor</p>
+
+        {% if error %}
+            <div class="message error-message">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="doctor_id">Select Doctor</label>
+                <select id="doctor_id" name="doctor_id" required>
+                    <option value="">-- Select a Doctor --</option>
+                    {% for doctor in doctors %}
+                        <option
+                            value="{{ doctor.id }}"
+                            data-from="{{ doctor.available_from|time:'H:i' }}"
+                            data-to="{{ doctor.available_to|time:'H:i' }}"
+                            data-duration="{{ doctor.appointment_duration }}"
+                            {% if selected_doctor_id == doctor.id|stringformat:"s" %}selected{% endif %}
+                        >
+                            Dr. {{ doctor.name }} - {{ doctor.specialization }}
+                            ({{ doctor.available_from|time:"h:i A" }} - {{ doctor.available_to|time:"h:i A" }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="appointment_date">Appointment Date</label>
+                <input
+                    type="date"
+                    id="appointment_date"
+                    name="appointment_date"
+                    min="{{ today }}"
+                    value="{{ appointment_date_value|default:'' }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="appointment_time">Available Appointment Time</label>
+                <select id="appointment_time" name="appointment_time" required>
+                    <option value="">-- Select doctor and date first --</option>
+                </select>
+                <p class="help-text" id="schedule-help">
+                    Select a doctor and date to view available appointment slots.
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Reason for Appointment</label>
+                <textarea
+                    id="reason"
+                    name="reason"
+                    placeholder="Describe your symptoms or reason for consultation"
+                    required
+                >{{ reason|default:'' }}</textarea>
+            </div>
+
+            <button type="submit">📅 Book Appointment</button>
+        </form>
+
+        <a href="{% url 'appointments' %}" class="back-btn">← Back to Appointments</a>
+    </div>
+</div>
+
+<script>
+    const doctorSelect = document.getElementById("doctor_id");
+    const dateInput = document.getElementById("appointment_date");
+    const timeSelect = document.getElementById("appointment_time");
+    const helpText = document.getElementById("schedule-help");
+    const previousTime = "{{ appointment_time_value|default:'' }}";
+    const bookedSlotsUrl = "{% url 'booked_slots' %}";
+
+    async function generateSlots() {
+        const option = doctorSelect.options[doctorSelect.selectedIndex];
+        const selectedDate = dateInput.value;
+
+        timeSelect.innerHTML = "";
+        timeSelect.appendChild(
+            new Option("-- Select an Appointment Time --", "")
+        );
+
+        if (!doctorSelect.value || !selectedDate) {
+            helpText.textContent =
+                "Select a doctor and date to view available appointment slots.";
+            return;
+        }
+
+        const from = option.dataset.from;
+        const to = option.dataset.to;
+        const duration = parseInt(
+            option.dataset.duration || "30",
+            10
+        );
+
+        if (!from || !to) {
+            helpText.textContent =
+                "This doctor has not configured working hours yet.";
+            return;
+        }
+
+        helpText.textContent = "Loading available time slots...";
+        timeSelect.disabled = true;
+
+        let bookedTimes = [];
+
+        try {
+            const response = await fetch(
+                `${bookedSlotsUrl}?doctor_id=${encodeURIComponent(doctorSelect.value)}&appointment_date=${encodeURIComponent(selectedDate)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Unable to load booked appointments."
+                );
+            }
+
+            bookedTimes = data.booked_times || [];
+
+        } catch (error) {
+            helpText.textContent =
+                "Unable to load available slots. Please try again.";
+            timeSelect.disabled = false;
+            return;
+        }
+
+        const [startHour, startMinute] =
+            from.split(":").map(Number);
+
+        const [endHour, endMinute] =
+            to.split(":").map(Number);
+
+        let current = startHour * 60 + startMinute;
+        const end = endHour * 60 + endMinute;
+        let count = 0;
+
+        while (current + duration <= end) {
+            const hours = Math.floor(current / 60)
+                .toString()
+                .padStart(2, "0");
+
+            const minutes = (current % 60)
+                .toString()
+                .padStart(2, "0");
+
+            const value = `${hours}:${minutes}`;
+
+            const slotDateTime = new Date(
+                `${selectedDate}T${value}:00`
+            );
+
+            const isPast = slotDateTime <= new Date();
+            const isBooked = bookedTimes.includes(value);
+
+            if (!isPast && !isBooked) {
+                const slot = new Option(value, value);
+
+                if (value === previousTime) {
+                    slot.selected = true;
+                }
+
+                timeSelect.appendChild(slot);
+                count++;
+            }
+
+            current += duration;
+        }
+
+        timeSelect.disabled = false;
+
+        if (count > 0) {
+            helpText.textContent =
+                `${count} available slot(s). Booked slots are hidden automatically.`;
+        } else {
+            helpText.textContent =
+                "No available appointment slots for the selected doctor and date.";
+        }
+    }
+
+    doctorSelect.addEventListener("change", generateSlots);
+    dateInput.addEventListener("change", generateSlots);
+
+    if (doctorSelect.value && dateInput.value) {
+        generateSlots();
+    }
+</script>
+</body>
+</html>

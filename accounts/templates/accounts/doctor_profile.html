@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Doctor Profile - MediAssist</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f4f6f9;
+    }
+
+    .header {
+        background: #2c7be5;
+        color: white;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h2 {
+        margin: 0;
+    }
+
+    .dashboard-btn {
+        background: white;
+        color: #2c7be5;
+        padding: 10px 18px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .profile-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .profile-container h2 {
+        margin-top: 0;
+        color: #2c7be5;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: bold;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+
+    .update-btn {
+        background: #2c7be5;
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .update-btn:hover {
+        opacity: 0.9;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h2>👨‍⚕️ MediAssist Doctor Panel</h2>
+
+    <a href="{% url 'doctor_dashboard' %}" class="dashboard-btn">
+        Back to Dashboard
+    </a>
+
+</div>
+
+<div class="profile-container">
+
+    <h2>My Profile</h2>
+
+    {% if success %}
+    <div class="success-message">
+        {{ success }}
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error-message">
+        {{ error }}
+    </div>
+    {% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label for="name">Full Name</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ doctor.name }}"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+            type="email"
+            id="email"
+            name="email"
+            value="{{ doctor.email }}"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input
+            type="text"
+            id="phone"
+            name="phone"
+            value="{{ doctor.phone }}"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="specialization">Specialization</label>
+        <input
+            type="text"
+            id="specialization"
+            name="specialization"
+            value="{{ doctor.specialization }}"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="available_from">Available From</label>
+        <input
+            type="time"
+            id="available_from"
+            name="available_from"
+            value="{{ doctor.available_from|time:'H:i' }}"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="available_to">Available To</label>
+        <input
+            type="time"
+            id="available_to"
+            name="available_to"
+            value="{{ doctor.available_to|time:'H:i' }}"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="appointment_duration">Appointment Duration (Minutes)</label>
+        <input
+            type="number"
+            id="appointment_duration"
+            name="appointment_duration"
+            value="{{ doctor.appointment_duration|default:30 }}"
+            min="1"
+            max="240"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 10px;">
+            <input
+                type="checkbox"
+                name="is_available"
+                {% if doctor.is_available %}checked{% endif %}
+                style="width: auto;"
+            >
+            Doctor is currently available for appointments
+        </label>
+    </div>
+
+    <button type="submit" class="update-btn">
+        Update Profile
+    </button>
+
+</form>
+
+</div>
+
+</body>
+</html>

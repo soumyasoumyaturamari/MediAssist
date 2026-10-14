@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Health Assistant | MediAssist</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f8fb;
+            color: #333;
+        }
+
+        /* Header */
+
+        .header {
+            background: #176b62;
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 25px;
+        }
+
+        .logout {
+            background: white;
+            color: #176b62;
+
+            padding: 9px 18px;
+
+            border-radius: 7px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+        .logout:hover {
+            background: #e8f5f3;
+        }
+
+        /* Container */
+
+        .container {
+
+            width: 800px;
+
+            max-width: 92%;
+
+            margin: 40px auto;
+        }
+
+        /* Main card */
+
+        .assistant-card {
+
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .title {
+
+            text-align: center;
+
+            margin-bottom: 10px;
+        }
+
+        .title h2 {
+
+            color: #176b62;
+
+            margin-bottom: 8px;
+        }
+
+        .title p {
+
+            color: #777;
+
+            line-height: 1.6;
+        }
+
+        /* Disclaimer */
+
+        .disclaimer {
+
+            background: #fff8e1;
+
+            color: #795548;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin: 25px 0;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+        /* Form */
+
+        .form-group {
+
+            margin-bottom: 20px;
+        }
+
+        label {
+
+            display: block;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        textarea {
+
+            width: 100%;
+
+            min-height: 140px;
+
+            padding: 14px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            resize: vertical;
+        }
+
+        textarea:focus {
+
+            outline: none;
+
+            border-color: #176b62;
+        }
+
+        button {
+
+            width: 100%;
+
+            padding: 13px;
+
+            background: #176b62;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+
+            background: #12554e;
+        }
+
+        /* Response */
+
+        .response {
+
+            margin-top: 30px;
+
+            background: #e8f5f3;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            border-left: 5px solid #176b62;
+        }
+
+        .response h3 {
+
+            color: #176b62;
+
+            margin-bottom: 10px;
+        }
+
+        .response p {
+
+            color: #555;
+
+            line-height: 1.7;
+        }
+
+        /* Emergency */
+
+        .emergency {
+
+            margin-top: 25px;
+
+            background: #ffe5e5;
+
+            color: #b00020;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+        /* Back */
+
+        .back-btn {
+
+            display: block;
+
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #176b62;
+
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+
+            text-decoration: underline;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 600px) {
+
+            .header {
+
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+
+                font-size: 20px;
+            }
+
+            .assistant-card {
+
+                padding: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- Header -->
+
+<div class="header">
+
+    <h1>🩺 MediAssist</h1>
+
+    <a
+        href="{% url 'patient_logout' %}"
+        class="logout"
+    >
+        Logout
+    </a>
+
+</div>
+
+
+<!-- Main -->
+
+<div class="container">
+
+    <div class="assistant-card">
+
+
+        <div class="title">
+
+            <h2>
+                🤖 AI Health Assistant
+            </h2>
+
+            <p>
+                Hello {{ patient.name }}! 👋
+                <br>
+                Describe your symptoms and get general health guidance.
+            </p>
+
+        </div>
+
+
+        <!-- Disclaimer -->
+
+        <div class="disclaimer">
+
+            ⚠️ <strong>Important:</strong>
+
+            This assistant provides general health information
+            and is not a medical diagnosis. Always consult a
+            qualified healthcare professional for diagnosis
+            and treatment.
+
+        </div>
+
+
+        <!-- Form -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label for="symptoms">
+
+                    🤒 Describe Your Symptoms
+
+                </label>
+
+                <textarea
+                    id="symptoms"
+                    name="symptoms"
+                    placeholder="Example: I have fever, headache and tiredness for two days..."
+                    required
+                >{{ symptoms }}</textarea>
+
+            </div>
+
+
+            <button type="submit">
+
+                🤖 Get Health Guidance
+
+            </button>
+
+        </form>
+
+
+        <!-- Response -->
+
+        {% if response %}
+
+    <div class="response">
+
+        <h3>
+            🤖 AI Health Guidance
+        </h3>
+
+        <p>
+            {{ response|linebreaksbr }}
+        </p>
+
+    </div>
+
+{% endif %}
+
+
+{% if error %}
+
+    <div class="emergency">
+
+        ⚠️ {{ error }}
+
+    </div>
+
+{% endif %}
+
+
+        <!-- Emergency warning -->
+
+        <div class="emergency">
+
+            🚨 <strong>Emergency:</strong>
+
+            If you are experiencing severe chest pain,
+            difficulty breathing, loss of consciousness,
+            severe bleeding, or another life-threatening
+            emergency, seek immediate medical attention
+            or contact your local emergency service.
+
+        </div>
+
+
+        <a
+            href="{% url 'patient_dashboard' %}"
+            class="back-btn"
+        >
+            ← Back to Dashboard
+        </a>
+
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

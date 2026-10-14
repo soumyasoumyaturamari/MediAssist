@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Medical History | MediAssist</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+            background: #f4f8fb;
+            color: #333;
+        }
+
+
+        /* Header */
+
+        .header {
+
+            background: #176b62;
+
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+
+        .header h1 {
+            font-size: 25px;
+        }
+
+
+        .logout {
+
+            background: white;
+
+            color: #176b62;
+
+            padding: 9px 18px;
+
+            border-radius: 7px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+
+        .logout:hover {
+            background: #e8f5f3;
+        }
+
+
+        /* Container */
+
+        .container {
+
+            width: 1000px;
+
+            max-width: 92%;
+
+            margin: 40px auto;
+        }
+
+
+        .page-title {
+
+            margin-bottom: 25px;
+        }
+
+
+        .page-title h2 {
+
+            color: #176b62;
+
+            margin-bottom: 8px;
+        }
+
+
+        .page-title p {
+
+            color: #777;
+        }
+
+
+        /* Medical record */
+
+        .record {
+
+            background: white;
+
+            padding: 25px;
+
+            margin-bottom: 25px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+
+        .record-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+
+            padding-bottom: 15px;
+
+            border-bottom: 1px solid #eee;
+        }
+
+
+        .record-header h3 {
+
+            color: #176b62;
+        }
+
+
+        .date {
+
+            background: #e8f5f3;
+
+            color: #176b62;
+
+            padding: 7px 12px;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+        }
+
+
+        .record-section {
+
+            margin-bottom: 18px;
+        }
+
+
+        .record-section h4 {
+
+            color: #333;
+
+            margin-bottom: 7px;
+        }
+
+
+        .record-section p {
+
+            color: #666;
+
+            line-height: 1.6;
+        }
+
+
+        /* No records */
+
+        .no-records {
+
+            background: white;
+
+            padding: 40px;
+
+            text-align: center;
+
+            border-radius: 15px;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+
+        .no-records .icon {
+
+            font-size: 50px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .no-records h3 {
+
+            color: #176b62;
+
+            margin-bottom: 10px;
+        }
+
+
+        .no-records p {
+
+            color: #777;
+
+            line-height: 1.6;
+        }
+
+
+        /* Back button */
+
+        .back-btn {
+
+            display: inline-block;
+
+            margin-top: 10px;
+
+            padding: 11px 20px;
+
+            background: #176b62;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 7px;
+        }
+
+
+        .back-btn:hover {
+
+            background: #12554e;
+        }
+
+
+        /* Responsive */
+
+        @media (max-width: 600px) {
+
+            .header {
+
+                padding: 15px 20px;
+            }
+
+
+            .header h1 {
+
+                font-size: 20px;
+            }
+
+
+            .record-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 10px;
+            }
+
+        }
+
+        .print-btn { display: inline-block; background: #176b62; color: #fff; border: 0; padding: 10px 16px; border-radius: 7px; cursor: pointer; margin: 0 0 20px; font-weight: bold; }
+
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            .header, .back-btn, .print-btn, .page-title p { display: none !important; }
+            .container { width: 100%; max-width: 100%; margin: 0; }
+            .record { box-shadow: none !important; border: 1px solid #ccc; break-inside: avoid; }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- Header -->
+
+<div class="header">
+
+    <h1>🩺 MediAssist</h1>
+
+    <a
+        href="{% url 'patient_logout' %}"
+        class="logout"
+    >
+        Logout
+    </a>
+
+</div>
+
+
+<!-- Main -->
+
+<div class="container">
+
+
+    <div class="page-title">
+
+        <h2>
+            📋 Medical History
+        </h2>
+
+        <p>
+            View your previous medical records and health information.
+        </p>
+
+    </div>
+
+
+    {% if records %}
+        <button type="button" class="print-btn" onclick="window.print()">Print Medical Records</button>
+
+
+        {% for record in records %}
+
+
+            <div class="record">
+
+
+                <div class="record-header">
+
+                    <h3>
+                        🩺 Dr. {{ record.doctor_name }}
+                    </h3>
+
+                    <span class="date">
+
+                        📅 {{ record.visit_date|date:"d M Y" }}
+
+                    </span>
+
+                </div>
+
+
+                <div class="record-section">
+
+                    <h4>
+                        🤒 Symptoms
+                    </h4>
+
+                    <p>
+                        {{ record.symptoms }}
+                    </p>
+
+                </div>
+
+
+                <div class="record-section">
+
+                    <h4>
+                        🔍 Diagnosis
+                    </h4>
+
+                    <p>
+                        {{ record.diagnosis }}
+                    </p>
+
+                </div>
+
+
+                <div class="record-section">
+
+                    <h4>
+                        💊 Prescription
+                    </h4>
+
+                    <p>
+                        {{ record.prescription }}
+                    </p>
+
+                </div>
+
+
+                {% if record.doctor_notes %}
+
+                    <div class="record-section">
+
+                        <h4>
+                            📝 Doctor's Notes
+                        </h4>
+
+                        <p>
+                            {{ record.doctor_notes }}
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+        {% endfor %}
+
+
+    {% else %}
+
+
+        <div class="no-records">
+
+            <div class="icon">
+                📋
+            </div>
+
+            <h3>
+                No Medical Records Yet
+            </h3>
+
+            <p>
+                Your medical history will appear here
+                after a doctor adds your medical record.
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+    <a
+        href="{% url 'patient_dashboard' %}"
+        class="back-btn"
+    >
+        ← Back to Dashboard
+    </a>
+
+
+</div>
+
+
+</body>
+
+</html>

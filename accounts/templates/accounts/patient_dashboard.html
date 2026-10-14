@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Patient Dashboard | MediAssist</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f8fb;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: #176b62;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 25px;
+        }
+
+        .logout {
+            background: white;
+            color: #176b62;
+            padding: 9px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout:hover {
+            background: #e8f5f3;
+        }
+
+        /* Main container */
+        .container {
+            width: 1100px;
+            max-width: 92%;
+            margin: 35px auto;
+        }
+
+        /* Welcome */
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .welcome h2 {
+            color: #176b62;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #777;
+        }
+
+        /* Statistics */
+        .stats-section {
+            margin-bottom: 35px;
+        }
+
+        .stats-section h2 {
+            color: #176b62;
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card h3 {
+            font-size: 15px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #176b62;
+        }
+
+        /* Main Feature Cards */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: #176b62;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #777;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-button {
+            display: inline-block;
+            background: #176b62;
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 7px;
+        }
+
+        .card-button:hover {
+            background: #12554e;
+        }
+
+        /* Profile information */
+        .profile-info {
+            margin-top: 15px;
+        }
+
+        .profile-info p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .profile-info strong {
+            color: #333;
+        }
+
+        /* AI Card */
+        .ai-card {
+            background: #e8f5f3;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+
+        <h1>🩺 MediAssist</h1>
+
+        <a href="{% url 'patient_logout' %}" class="logout">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <!-- Welcome -->
+        <div class="welcome">
+
+            <h2>
+                Welcome, {{ patient.name }}! 👋
+            </h2>
+
+            <p>
+                Manage your healthcare information from your MediAssist dashboard.
+            </p>
+
+        </div>
+
+
+        <!-- Appointment Statistics -->
+        <div class="stats-section">
+
+            <h2>📊 Appointment Overview</h2>
+
+            <div class="stats-container">
+
+                <!-- Total -->
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <h3>Total Appointments</h3>
+                    <div class="stat-number">
+                        {{ total_appointments }}
+                    </div>
+                </div>
+
+
+                <!-- Pending -->
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <h3>Pending</h3>
+                    <div class="stat-number">
+                        {{ pending_appointments }}
+                    </div>
+                </div>
+
+
+                <!-- Approved -->
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <h3>Approved</h3>
+                    <div class="stat-number">
+                        {{ approved_appointments }}
+                    </div>
+                </div>
+
+
+                <!-- Completed -->
+                <div class="stat-card">
+                    <div class="stat-icon">🎉</div>
+                    <h3>Completed</h3>
+                    <div class="stat-number">
+                        {{ completed_appointments }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Dashboard Cards -->
+        <div class="card-container">
+
+            <!-- My Profile -->
+            <div class="card">
+
+                <div class="icon">👤</div>
+
+                <h3>My Profile</h3>
+
+                <p>
+                    View your personal information and contact details.
+                </p>
+
+                <div class="profile-info">
+
+                    <p>
+                        <strong>Name:</strong>
+                        {{ patient.name }}
+                    </p>
+
+                    <p>
+                        <strong>Email:</strong>
+                        {{ patient.email }}
+                    </p>
+
+                    <p>
+                        <strong>Phone:</strong>
+                        {{ patient.phone }}
+                    </p>
+
+                    <p>
+                        <strong>Age:</strong>
+                        {{ patient.age }}
+                    </p>
+
+                    <p>
+                        <strong>Gender:</strong>
+                        {{ patient.gender }}
+                    </p>
+
+                </div>
+
+                <a href="{% url 'patient_profile' %}" class="card-button">
+                    View / Edit Profile
+                </a>
+
+            </div>
+
+
+            <!-- Medical History -->
+            <div class="card">
+
+                <div class="icon">📋</div>
+
+                <h3>Medical History</h3>
+
+                <p>
+                    View your previous medical records, diagnoses,
+                    prescriptions, and health information.
+                </p>
+
+                <a href="{% url 'medical_history' %}" class="card-button">
+                    View History
+                </a>
+
+            </div>
+
+
+            <!-- Appointments -->
+            <div class="card">
+
+                <div class="icon">📅</div>
+
+                <h3>Appointments</h3>
+
+                <p>
+                    Book appointments with doctors and check your
+                    upcoming appointments.
+                </p>
+
+                <a href="{% url 'appointments' %}" class="card-button">
+                    View Appointments
+                </a>
+
+            </div>
+
+
+            <!-- AI Health Assistant -->
+            <div class="card ai-card">
+
+                <div class="icon">🤖</div>
+
+                <h3>AI Health Assistant</h3>
+
+                <p>
+                    Enter your symptoms and get basic AI-powered
+                    health guidance.
+                </p>
+
+                <a href="{% url 'ai_assistant' %}" class="card-button">
+                    Open AI Assistant
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

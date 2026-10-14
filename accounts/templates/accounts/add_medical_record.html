@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Medical Record - MediAssist</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .navbar {
+            background: #3f73b8;
+            color: white;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+
+        .back-btn {
+            background: white;
+            color: #3f73b8;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-card h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .patient-info {
+            background: #f0f5fb;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .patient-info p {
+            margin: 8px 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            margin-top: 25px;
+            background: #3f73b8;
+            color: white;
+            border: none;
+            padding: 13px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #315f9e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <h2>👨‍⚕️ MediAssist Doctor Panel</h2>
+
+        <a href="{% url 'doctor_dashboard' %}" class="back-btn">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="container">
+
+        <div class="form-card">
+
+            <h1>Add Medical Record</h1>
+
+            <div class="patient-info">
+                <p>
+                    <strong>Patient:</strong>
+                    {{ appointment.patient.name }}
+                </p>
+
+                <p>
+                    <strong>Appointment Date:</strong>
+                    {{ appointment.appointment_date }}
+                </p>
+
+                <p>
+                    <strong>Appointment Time:</strong>
+                    {{ appointment.appointment_time }}
+                </p>
+
+                <p>
+                    <strong>Appointment Reason:</strong>
+                    {{ appointment.reason }}
+                </p>
+            </div>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <label for="visit_date">Visit Date</label>
+
+                <input
+                    type="date"
+                    id="visit_date"
+                    name="visit_date"
+                    value="{{ appointment.appointment_date|date:'Y-m-d' }}"
+                    required
+                >
+
+                <label for="symptoms">Symptoms</label>
+
+                <textarea
+                    id="symptoms"
+                    name="symptoms"
+                    required
+                >{{ appointment.reason }}</textarea>
+
+
+                <label for="diagnosis">Diagnosis</label>
+
+                <textarea
+                    id="diagnosis"
+                    name="diagnosis"
+                    placeholder="Enter diagnosis"
+                    required
+                ></textarea>
+
+
+                <label for="prescription">Prescription</label>
+
+                <textarea
+                    id="prescription"
+                    name="prescription"
+                    placeholder="Enter prescribed medicines or treatment"
+                    required
+                ></textarea>
+
+
+                <label for="doctor_notes">Doctor Notes</label>
+
+                <textarea
+                    id="doctor_notes"
+                    name="doctor_notes"
+                    placeholder="Enter additional notes"
+                ></textarea>
+
+
+                <button type="submit" class="submit-btn">
+                    Save Medical Record
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
