@@ -43,6 +43,25 @@ urlpatterns = [
     path("doctor/logout/", views.doctor_logout, name="doctor_logout"),
 
     # =========================
+    # MEDICAL RECORD
+    # =========================
+    # IMPORTANT: Keep this specific URL BEFORE the generic
+    # appointment status URL below. Otherwise Django will match
+    # "medical-records" as the <str:status> value and redirect
+    # back to the doctor dashboard.
+    path(
+        "doctor/add-medical-record/<int:appointment_id>/",
+        views.add_medical_record,
+        name="add_medical_record"
+    ),
+
+    path(
+        "doctor/appointment/<int:appointment_id>/medical-records/",
+        views.view_patient_medical_records,
+        name="view_patient_medical_records"
+    ),
+
+    # =========================
     # APPOINTMENT STATUS
     # =========================
     path(
@@ -50,14 +69,4 @@ urlpatterns = [
         views.update_appointment_status,
         name="update_appointment_status"
     ),
-
-    # =========================
-    # MEDICAL RECORD
-    # =========================
-    path(
-        "doctor/add-medical-record/<int:appointment_id>/",
-        views.add_medical_record,
-        name="add_medical_record"
-    ),
-    path("doctor/appointment/<int:appointment_id>/medical-records/", views.view_patient_medical_records, name="view_patient_medical_records"),
 ]
