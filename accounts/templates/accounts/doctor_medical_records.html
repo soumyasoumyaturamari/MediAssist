@@ -1,5 +1,237 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Patient Medical Records | MediAssist</title>
-<style>body{font-family:Arial,sans-serif;background:#f4f8fb;color:#333;margin:0}.header{background:#176b62;color:white;padding:18px 32px}.container{max-width:1000px;width:92%;margin:30px auto}.record{background:white;padding:24px;margin:18px 0;border-radius:12px;box-shadow:0 3px 12px #0001}.record h3{color:#176b62;margin-top:0}.field{margin:14px 0}.field strong{display:block;margin-bottom:5px}.back{display:inline-block;background:#176b62;color:white;padding:10px 16px;border-radius:6px;text-decoration:none}@media print{.header,.back{display:none}.record{box-shadow:none;border:1px solid #ccc;break-inside:avoid}}</style></head>
-<body><div class="header"><h2>MediAssist — Patient Medical Records</h2></div><main class="container"><h2>{{ patient.name }}'s Medical Records</h2><button class="back" onclick="window.print()" type="button">Print Records</button><p>Completed appointment: {{ appointment.appointment_date|date:"d M Y" }} at {{ appointment.appointment_time|time:"H:i" }}</p>
-{% for record in records %}<section class="record"><h3>Visit Date: {{ record.visit_date|date:"d M Y" }}</h3><p><strong>Doctor:</strong> {{ record.doctor_name }}</p><div class="field"><strong>Symptoms</strong>{{ record.symptoms|linebreaksbr }}</div><div class="field"><strong>Diagnosis</strong>{{ record.diagnosis|linebreaksbr }}</div><div class="field"><strong>Prescription</strong>{{ record.prescription|linebreaksbr }}</div>{% if record.doctor_notes %}<div class="field"><strong>Doctor's Notes</strong>{{ record.doctor_notes|linebreaksbr }}</div>{% endif %}</section>{% empty %}<p>No medical records found for this patient.</p>{% endfor %}<a class="back" href="{% url 'doctor_dashboard' %}">Back to Dashboard</a></main></body></html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Records | MediAssist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .header {
+            background: #2c7be5;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            margin: 0;
+        }
+
+        .back-btn,
+        .print-btn {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            background: white;
+            color: #2c7be5;
+        }
+
+        .print-btn {
+            border: 0;
+            background: #176b62;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 25px 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        h2, h3 {
+            color: #176b62;
+        }
+
+        .patient-info {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 30px;
+        }
+
+        .record {
+            border-top: 4px solid #2c7be5;
+        }
+
+        .field {
+            margin: 14px 0;
+            line-height: 1.6;
+        }
+
+        .field strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .actions {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .container {
+                margin-top: 20px;
+                padding: 0 15px 30px;
+            }
+
+            .patient-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            .header,
+            .actions {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h2>👨‍⚕️ MediAssist Doctor Panel</h2>
+    <a href="{% url 'doctor_dashboard' %}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Patient Medical Records</h2>
+
+        <div class="patient-info">
+            <div>
+                <strong>Patient:</strong>
+                {{ patient.name }}
+            </div>
+
+            <div>
+                <strong>Phone:</strong>
+                {{ patient.phone }}
+            </div>
+
+            <div>
+                <strong>Appointment Date:</strong>
+                {{ appointment.appointment_date|date:"d M Y" }}
+            </div>
+
+            <div>
+                <strong>Appointment Time:</strong>
+                {{ appointment.appointment_time|time:"h:i A" }}
+            </div>
+
+            <div>
+                <strong>Reason:</strong>
+                {{ appointment.reason }}
+            </div>
+
+            <div>
+                <strong>Status:</strong>
+                {{ appointment.status }}
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="button" class="print-btn" onclick="window.print()">
+                🖨 Print Medical Records
+            </button>
+        </div>
+    </div>
+
+    {% if records %}
+
+        {% for record in records %}
+        <div class="card record">
+            <h3>Medical Record</h3>
+
+            <div class="field">
+                <strong>Visit Date:</strong>
+                {{ record.visit_date|date:"d M Y" }}
+            </div>
+
+            <div class="field">
+                <strong>Doctor:</strong>
+                {{ record.doctor_name }}
+            </div>
+
+            <div class="field">
+                <strong>Symptoms:</strong>
+                {{ record.symptoms|linebreaksbr }}
+            </div>
+
+            <div class="field">
+                <strong>Diagnosis:</strong>
+                {{ record.diagnosis|linebreaksbr }}
+            </div>
+
+            <div class="field">
+                <strong>Prescription:</strong>
+                {{ record.prescription|linebreaksbr }}
+            </div>
+
+            {% if record.doctor_notes %}
+            <div class="field">
+                <strong>Doctor Notes:</strong>
+                {{ record.doctor_notes|linebreaksbr }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card empty">
+            <h3>No Medical Records Found</h3>
+            <p>
+                There are no medical records available for this patient yet.
+            </p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

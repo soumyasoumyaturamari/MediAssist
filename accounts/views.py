@@ -1027,8 +1027,9 @@ def cancel_appointment(request, appointment_id):
 
 
 def view_patient_medical_records(request, appointment_id):
-    """Let the assigned doctor view the patient's medical records for an appointment."""
+    """Allow the logged-in doctor to view medical records for a completed appointment."""
     doctor_id = request.session.get("doctor_id")
+
     if not doctor_id:
         return redirect("doctor_login")
 
@@ -1040,41 +1041,66 @@ def view_patient_medical_records(request, appointment_id):
         return redirect("doctor_login")
 
     try:
-        appointment = Appointment.objects.select_related("patient", "doctor").get(
-            id=appointment_id
-        )
+        appointment = Appointment.objects.select_related(
+            "patient", "doctor"
+        ).get(id=appointment_id)
     except Appointment.DoesNotExist:
         messages.error(request, "The requested appointment could not be found.")
         return redirect("doctor_dashboard")
 
-    # Prefer the foreign-key relationship. Some older appointments were saved
-    # with doctor_name only, so safely support those legacy records as well.
-    is_assigned_doctor = appointment.doctor_id == doctor.id
-    is_legacy_assignment = False
-    if appointment.doctor_id is None:
-        assigned_name = " ".join((appointment.doctor_name or "").casefold().split())
-        doctor_name = " ".join((doctor.name or "").casefold().split())
-        doctor_name_without_prefix = doctor_name[4:] if doctor_name.startswith("dr. ") else doctor_name
-        assigned_name_without_prefix = assigned_name[4:] if assigned_name.startswith("dr. ") else assigned_name
-        is_legacy_assignment = bool(
-            doctor_name and (
-                assigned_name == doctor_name
-                or assigned_name.startswith(doctor_name + " ")
-                or assigned_name_without_prefix == doctor_name_without_prefix
-                or assigned_name_without_prefix.startswith(doctor_name_without_prefix + " ")
-            )
+    # The current Appointment model normally stores the assigned Doctor
+    # in appointment.doctor. Older appointments may have only doctor_name,
+    # so support both forms.
+    is_assigned_doctor = (
+        appointment.doctor_id is not None
+        and appointment.doctor_id == doctor.id
+    )
+
+    def normalize_name(value):
+        value = " ".join((value or "").casefold().split())
+        if value.startswith("dr. "):
+            value = value[4:]
+        return value
+
+    assigned_name = normalize_name(appointment.doctor_name)
+    logged_in_doctor_name = normalize_name(doctor.name)
+
+    is_legacy_assignment = (
+        appointment.doctor_id is None
+        and bool(logged_in_doctor_name)
+        and (
+            assigned_name == logged_in_doctor_name
+            or assigned_name.startswith(logged_in_doctor_name + " -")
+            or assigned_name.startswith(logged_in_doctor_name + " ")
         )
+    )
 
     if not (is_assigned_doctor or is_legacy_assignment):
-        messages.error(request, "This appointment is not assigned to your doctor account.")
+        messages.error(
+            request,
+            "This appointment is not assigned to your doctor account."
+        )
         return redirect("doctor_dashboard")
 
-    # MedicalRecord is linked to Patient (not Appointment) in this project's
-    # schema, so display that patient's records. An empty list is valid and is
-    # rendered as an explanatory message by doctor_medical_records.html.
-    records = appointment.patient.medical_records.all().order_by("-visit_date", "-created_at")
-    return render(request, "accounts/doctor_medical_records.html", {
-        "appointment": appointment,
-        "patient": appointment.patient,
-        "records": records,
-    })
+    if appointment.status != "Completed":
+        messages.error(
+            request,
+            "Medical records can be viewed only for completed appointments."
+        )
+        return redirect("doctor_dashboard")
+
+    records = appointment.patient.medical_records.all().order_by(
+        "-visit_date",
+        "-created_at"
+    )
+
+    return render(
+        request,
+        "accounts/doctor_medical_records.html",
+        {
+            "doctor": doctor,
+            "appointment": appointment,
+            "patient": appointment.patient,
+            "records": records,
+        }
+    )
