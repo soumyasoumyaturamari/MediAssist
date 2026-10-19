@@ -13,31 +13,38 @@
         .header {
             background: #2c7be5;
             color: white;
-            padding: 20px 40px;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
         }
 
         .header h2 {
             margin: 0;
+            font-size: 22px;
         }
 
-        .logout-btn,
-        .profile-btn {
+        .header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .profile-btn,
+        .logout-btn {
             background: white;
             color: #2c7be5;
-            padding: 10px 18px;
+            padding: 9px 14px;
             text-decoration: none;
-            border-radius: 5px;
-            margin-left: 10px;
+            border-radius: 6px;
+            font-weight: bold;
             display: inline-block;
+            white-space: nowrap;
         }
 
-        .profile-btn:hover,
-        .logout-btn:hover {
-            opacity: 0.9;
-        }
 
         .container {
             padding: 30px 50px;
@@ -120,6 +127,37 @@
         .filter-btn.active {
             background: #2c7be5;
             color: white;
+        }
+
+        @media (max-width: 700px) {
+            header {
+                padding: 12px 15px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .header h2 {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+
+            .header-actions {
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .header-actions span {
+                width: 100%;
+                font-size: 14px;
+                margin-bottom: 3px;
+            }
+
+            .profile-btn,
+            .logout-btn {
+                padding: 8px 13px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
